@@ -1,11 +1,11 @@
 {
-  "name": "nodejs-backend-starter-kit",
-  "version": "2.0.0",
-  "description": "Modern Node.js backend starter kit with authentication, real-time features, and service integrations",
+  "name": "pratham-backend",
+  "version": "1.0.0",
+  "description": "An indian ai chat application backend",
   "main": "src/index.js",
   "type": "module",
-  "repository": "https://github.com/ahmadalsharef994/nodejs-backend-starter-kit.git",
-  "author": "Ahmad Alsharef <ahmadalsharef@gmail.com>",
+  "repository": "",
+  "author": "jangdmanish <jangdmanish@gmail.com>",
   "license": "MIT",
   "engines": {
     "node": ">=18.0.0"
@@ -29,7 +29,6 @@
     "node",
     "nodejs",
     "backend",
-    "starter-kit",
     "express",
     "rest",
     "api",
@@ -51,7 +50,15 @@
     "jest",
     "husky",
     "security",
-    "boilerplate"
+    "boilerplate",
+    "pratham",
+    "ai",
+    "chat",
+    "indian",
+    "chatbot",
+    "chatgpt",
+    "openai",
+    "gpt"
   ],
   "dependencies": {
     "@elastic/elasticsearch": "^8.15.1",
