@@ -1,5 +1,5 @@
-// socketManager.ts
 import { Server, Socket } from "socket.io";
+import ollama from 'ollama'
 
 interface UserSocket {
   userId: string;
