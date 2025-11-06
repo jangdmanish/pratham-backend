@@ -11,24 +11,24 @@ import { getClientIp } from '@supercharge/request-ip';
 import config from './config/config.js';
 import { successHandler, errorHandler as httpErrorHandler } from './config/httpLogger.js';
 import jwtStrategy from './config/jwtStrategy.js';
-import routes from './routes/v1/index.js';
+//import routes from './routes/v1/index.js';
 import { errorConverter, errorHandler } from './middlewares/error.js';
 import ApiError from './utils/ApiError.js';
 
 const app = express();
 
 // Logging middleware
-if (config.env !== 'test') {
+//if (config.env !== 'test') {
   app.use(successHandler);
   app.use(httpErrorHandler);
-}
+//}
 
 // Security middleware
 app.use(helmet());
 app.use(xss());
 app.use(mongoSanitize());
-app.use(cors());
-app.options('*', cors());
+//app.use(cors());
+//app.options('*', cors());
 
 // Body parsing and request setup
 app.use(express.json());
@@ -40,8 +40,8 @@ app.use((req, res, next) => {
 });
 
 // Authentication middleware
-app.use(passport.initialize());
-passport.use('jwt', jwtStrategy);
+//app.use(passport.initialize());
+//passport.use('jwt', jwtStrategy);
 
 // Health check endpoint
 app.get('/health', (req, res) => {
@@ -55,12 +55,12 @@ app.get('/health', (req, res) => {
 });
 
 // API routes
-app.use('/v1', routes);
+//app.use('/v1', routes);
 
 // Monitoring and Metrics
-const register = new promclient.Registry();
-register.setDefaultLabels({ app: 'NODE_BOILERPLATE' });
-promclient.collectDefaultMetrics({ register });
+//const register = new promclient.Registry();
+//register.setDefaultLabels({ app: 'NODE_BOILERPLATE' });
+//promclient.collectDefaultMetrics({ register });
 
 app.get('/api-metrics', async (req, res) => {
   res.setHeader('Content-Type', register.contentType);
@@ -68,10 +68,11 @@ app.get('/api-metrics', async (req, res) => {
 });
 
 // Error Handling
-app.use((req, res, next) => {
-  next(new ApiError(httpStatus.NOT_FOUND, 'Not found We are Monitoring It ☠️'));
-});
-app.use(errorConverter);
-app.use(errorHandler);
+//app.use((req, res, next) => {
+ // next(new ApiError(httpStatus.NOT_FOUND, 'Not found We are Monitoring It ☠️'));
+//});
+
+//app.use(errorConverter);
+//app.use(errorHandler);
 
 export default app;

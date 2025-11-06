@@ -5,49 +5,24 @@ import { v4 as uuidv4 } from 'uuid';
 import app from './app.js';
 import config from './config/config.js';
 import appLogger from './config/appLogger.js';
-import { chatService } from './services/index.js';
-
+//import { chatService } from './services/index.js';
+//import {FilesetResolver, LlmInference} from './assets/tasks-genai/package/genai_bundle.mjs';
+//const gemmaModelFileName = './assets/gemma-3n-E2B-it-int4-Web.litertlm';
+import SocketManager from './utils/socketManager.js';
 // Database Connection
-mongoose.connect(config.mongoose.url, config.mongoose.options).then(() => {
-  appLogger.info('Connected to MongoDB');
-});
+//mongoose.connect(config.mongoose.url, config.mongoose.options).then(() => {
+ // appLogger.info('Connected to MongoDB');
+//});
 
 // Server Setup
 const server = app.listen(config.port, () => {
-  appLogger.info(`Listening to port ${config.port}`);
+  appLogger.info(`Server listening to port ${config.port}`);
 });
 
-// WebSocket (Socket.io) Setup
-const io = new Server(server, {
-  cors: {
-    origin: '*',
-    methods: ['GET', 'POST'],
-  },
-});
+SocketManager.getInstance().initialize(server);
 
-io.on('connection', (socket) => {
-  appLogger.info(`User connected: ${socket.id}`);
-  
-  socket.on('join_appointment', (appointmentId) => socket.join(appointmentId));
-
-  socket.on('send_message', async (data) => {
-    if (data.attachments) {
-      data.attachments = await chatService.uploadAttachment(data.attachments);
-    }
-    socket.to(data.appointmentId).emit('receive_message', {
-      messageId: uuid(),
-      body: data.body,
-      contentType: 'text',
-      attachments: data.attachments,
-      createdAt: Date.now(),
-      senderId: data.senderId,
-    });
-    chatService.saveMessage(data);
-  });
-  
-  app.set('socket.io', io);
-});
-
+app.get("/", (_, res) => res.send("Pratham server is running 🚀"));
+ 
 // Handle graceful shutdown
 const exitHandler = () => {
   if (server) {
