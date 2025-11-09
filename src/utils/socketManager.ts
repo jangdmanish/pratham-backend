@@ -1,5 +1,5 @@
 import { Server, Socket } from "socket.io";
-import ollama from 'ollama'
+import {ollamaChat} from '../services/ollama.service.ts';
 
 interface UserSocket {
   userId: string;
@@ -57,15 +57,17 @@ class SocketManager {
       });
 
       socket.on('client_message', async (data) => {
-        console.log("data" + data);
-        const response = await ollama.chat({
-          model: 'gemma3:270m',
-          messages: [{ role: 'user', content: data}],
-          stream: true,
-        });
-        //console.log(part.message.content);
-        for await (const part of response) {
-          socket.emit('server_message', part.message.content);
+        try{
+          console.log("data : " + data.text);
+          const response = await ollamaChat(data.text);
+          //console.log(part.message.content);
+          for await (const part of response) {
+            socket.emit('server_message', {'type':'token','token':part.message.content});
+            //console.log("\n" + part.message.content);
+          }
+          socket.emit('server_message', {'type':'done','token':""});
+        }catch(err){
+          console.error(err);
         }
       });
 

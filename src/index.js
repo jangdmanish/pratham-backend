@@ -5,11 +5,13 @@ import config from "./config/config.js";
 import appLogger from "./config/appLogger.js";
 //import { chatService } from './services/index.js';
 import SocketManager from "./utils/socketManager.ts";
-
+import { startOllama } from "./services/ollama.service.ts";
 // Database Connection
 //mongoose.connect(config.mongoose.url, config.mongoose.options).then(() => {
 // appLogger.info('Connected to MongoDB');
 //});
+
+startOllama();
 
 // Server Setup
 const server = app.listen(config.port, () => {

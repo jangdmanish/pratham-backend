@@ -1,3 +1,5 @@
+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
+
 # Modern Node.js Backend Starter Kit
 
 A streamlined, modern Node.js backend starter kit designed for rapid development of scalable APIs. Built with **ES Modules**, **authentication**, **real-time features**, and **service integrations**.
