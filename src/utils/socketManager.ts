@@ -1,5 +1,7 @@
 import { Server, Socket } from "socket.io";
-import {ollamaChat} from '../services/ollama.service.ts';
+import OllamaLLMManager from "./ollamaManager.ts";
+//import weatherAgentLLM from "../agents/weatherAgent.ts";
+const chatMemoryMap = new Map<string, any[]>();
 
 interface UserSocket {
   userId: string;
@@ -34,38 +36,35 @@ class SocketManager {
     });
 
     this.io.on("connection", (socket: Socket) => {
-      console.log(`🔌 Client connected: ${socket.id}`);
-
+      console.log(`🔌 Client connected : ${socket.id}`);
+      chatMemoryMap.set(socket.id,[]);
       // Handle registration (e.g., when user logs in)
       socket.on("register", (userId: string) => {
-        this.connectedUsers.set(userId, socket.id);
-        console.log(`✅ Registered user ${userId} with socket ${socket.id}`);
-        this.io?.emit("users", Array.from(this.connectedUsers.keys())); // broadcast user list
-      });
-
-      // Handle private messages
-      socket.on("private_message", (data: { to: string; message: string }) => {
-        const recipientSocketId = this.connectedUsers.get(data.to);
-        if (recipientSocketId) {
-          this.io?.to(recipientSocketId).emit("private_message", {
-            from: socket.id,
-            message: data.message,
-          });
-        } else {
-          console.log(`❌ User ${data.to} not connected`);
-        }
+        //this.connectedUsers.set(userId, socket.id);
+        //console.log(`✅ Registered user ${userId} with socket ${socket.id}`);
+       // this.io?.emit("users", Array.from(this.connectedUsers.keys())); // broadcast user list
       });
 
       socket.on('client_message', async (data) => {
         try{
           console.log("data : " + data.text);
-          const response = await ollamaChat(data.text);
-          //console.log(part.message.content);
-          for await (const part of response) {
-            socket.emit('server_message', {'type':'token','token':part.message.content});
-            //console.log("\n" + part.message.content);
+          const chatArray = chatMemoryMap.get(socket.id);
+          if (chatArray) {
+            chatArray.push({'role':'user','content':data.text});
+            chatMemoryMap.set(socket.id,chatArray);
+            const llmResponse = await OllamaLLMManager.getInstance().getLLM().stream(chatArray);
+            let complete_response='';
+            for await (const chunk of llmResponse) {
+              socket.emit('server_message', {'type':'token','token':chunk.content});
+              complete_response = complete_response + chunk.content;
+            }
+            console.log("complete_response : " + complete_response);
+            socket.emit('server_message', {'type':'done','token':""});
+            chatMemoryMap.get(socket.id)?.push({'role':'assistant','content':complete_response});
+          }else{
+            //do nothing
           }
-          socket.emit('server_message', {'type':'done','token':""});
+          
         }catch(err){
           console.error(err);
         }
@@ -78,14 +77,16 @@ class SocketManager {
 
       socket.on("disconnect", () => {
         // Remove user from map on disconnect
-        for (const [userId, sockId] of this.connectedUsers.entries()) {
+        /*for (const [userId, sockId] of this.connectedUsers.entries()) {
           if (sockId === socket.id) {
             this.connectedUsers.delete(userId);
             console.log(`❌ User ${userId} disconnected`);
             break;
           }
         }
-        this.io?.emit("users", Array.from(this.connectedUsers.keys()));
+        //this.io?.emit("users", Array.from(this.connectedUsers.keys()));*/
+        chatMemoryMap.delete(socket.id);
+        console.log(`❌ User ${socket.id} disconnected`);
       });
     });
 

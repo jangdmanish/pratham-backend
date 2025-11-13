@@ -1,7 +1,7 @@
 //import { genkit } from 'genkit';
 //import { ollama } from 'genkitx-ollama';
 import { spawn } from "node:child_process";
-import ollama  from "ollama";
+import { ChatOllama } from "@langchain/ollama";
 /*const ollamaDev = {
   models: [{ name: 'gemma3:270m' }],
   serverAddress: 'http://127.0.0.1:11434',
@@ -36,11 +36,13 @@ export async function startOllama() {
 }
 
 
-export async function ollamaChat(text:string){
-  return await ollama.chat({
-    model: 'gemma3:270m',
-    messages: [{ role: 'user', content: text }],
-    stream: true,
-  });
+export function getOllamaLLM(text?:string){
+  return new ChatOllama({
+    model: "gemma3:270m",
+    temperature: 0,
+    maxRetries: 2,
+    streaming:true,
+    // other params...
+})
 }
 
