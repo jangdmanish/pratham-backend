@@ -1,4 +1,4 @@
-# Pratham is a chatbot with locally hosted LLM using Ollama under development 
+# Pratham is a chatbot with locally hosted LLM using Ollam
 
 
 ## 🚀 Features
